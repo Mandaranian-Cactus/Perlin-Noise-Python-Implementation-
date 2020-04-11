@@ -14,12 +14,9 @@ class Window:
         self.screen.fill((255, 255, 255))
 
 
-def fade(t):  # Fade function to smooth out rigidness
-    return 6 * t ** 5-15 * t ** 4+10 * t ** 3
-
 def add_octaves(x, y, octaves, persistences, frequencies):  # Here, octaves/perlin noises are combined together
     total = 0  # Total of the accumulated sums of the octaves
-    max_value = 0   # Used to keep the output to be between 0 - 1
+    max_value = 0  # Used to help the output be between 0 - 1 (Combined with later code)
     for i in range(octaves):
         persistence = persistences[i]  # Persistence regulates how much an octave affects the final overall outcome
         frequency = frequencies[i]  # Frequency dictates the gap between points on an octave (Smaller gaps have smoother curves while larger gaps have more rigid curves)
@@ -28,11 +25,13 @@ def add_octaves(x, y, octaves, persistences, frequencies):  # Here, octaves/perl
         max_value += persistence
     return total / max_value
 
-def lower(x):
+
+def lower(x):  # In this case, function pushes up on values closer to center while doing nothing to the poles
     return -.2 * x ** 1.4 + 0.05
 
-def upper(x):
-   return -(x) ** (1/2) + 1
+
+def upper(x):  # In this case, function pushes down exponentially on values near the poles
+    return -(x) ** (1/2) + 1
 
 
 screen = Window(700, 525)
@@ -50,13 +49,12 @@ for y in range(h):
     x_pos = 100.51
     for x in range(w):
         output = add_octaves(x_pos, y_pos, len(persistences), persistences,frequencies)
-        output = (output + 1) /2  # Set within the range from 0 - 2
-        output = output ** 2  # Exponential add (This adjusts the range of the output from 0 - 2 to 0 - 2 ** expoenent)
-        d = abs(x / w - 1 / 2) + abs(
-			y / h - 1 / 2)  # We have two "- 1/2" for making sure that d is within the range of 0 - 1
-        output = lower(d) + output * (upper(d) - lower(d))
-        # Note the operation is exponential so polar points will be stretched out the most
+        output = (output + 1) /2  # Set within the range from 0 - 1
+        output = output ** 2  # Exponential function used to create more rigidness and variation (Leads to more ocean and mountains)
+        d = abs(x / w - 1 / 2) + abs(y / h - 1 / 2)  # We have two "- 1/2" for making sure that d is within the range of 0 - 1
+        output = lower(d) + output * (upper(d) - lower(d))  # Formula for computing the stretch/compression at a given point and d-value
 
+        # Limits for each terrain type (Water, Mountain, forest, etc.)
         if output < 0.1:
             color = (0,0,175)  # Water
         elif output < 0.12:
@@ -80,5 +78,4 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-    # pygame.display.update()
     clock.tick(50)  # Fps (Don't know why/how it does it)
