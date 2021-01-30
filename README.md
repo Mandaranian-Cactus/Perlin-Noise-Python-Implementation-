@@ -3,7 +3,7 @@ https://www.redblobgames.com/maps/terrain-from-noise/#trees
 
 <table>
   <tr>
-    <td><img align="center" src="Height OnlyPNG"></td>
+    <td><img align="center" src="Height Only.PNG"></td>
   </tr>
   <tr>
     <td><img src="Height + Moisture Tree Placement.PNG"></td>
